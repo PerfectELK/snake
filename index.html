@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+<style>
+#canvas{
+	position: absolute;
+	top:50%;
+	left:50%;
+	background-color: #ddd;
+	transform: translate(-50%,-50%);
+}	
+body{
+	margin: 0;
+	padding: 0;
+	background-color: #222;
+}	
+</style>
+</head>
+<body>
+	<canvas id="canvas"></canvas>	
+</body>
+</html>
+<script>
+var stable = window.innerHeight * 0.8 / 20
+
+function rand(val,num){
+      return Math.floor(Math.floor(val) / num) * num;
+}
+
+
+
+var canvas = document.getElementById("canvas"),
+	ctx    = canvas.getContext('2d'),
+	heightt =  window.innerHeight*0.8,
+	widthh  =  window.innerWidth*0.8;
+
+
+
+
+	var height =  canvas.height = rand(heightt,20);
+	var width =  canvas.width  = rand(widthh,20);
+	var direction;
+	var step = 15;
+	var x;
+	var y;
+	var snakes = [];
+	var opts = {
+		size: 20,
+		speed: 20,
+		color: "rgba(0,200,0,1)",
+		colorApple: "rgba(242, 7, 7,1)"
+	};
+
+	window.onresize = function(){
+	heightt =  window.innerHeight*0.8,
+	widthh  =  window.innerWidth*0.8;
+	var height =  canvas.height = rand(heightt,20);
+	var width =  canvas.width  = rand(widthh,20);
+	}
+
+	function snake(x,y,color,sequencing){
+		this.x = x;
+		this.y = y;
+		this.color = color;
+		this.sequencing = sequencing;
+
+	}
+	function addSnake(){
+		var snake1 = new snake(20,0,opts.color,0);
+		snakes.push(snake1);
+	}
+
+
+	addSnake();
+
+	var apples = [];
+	function appless(x,y){
+		this.x = x;
+		this.y = y;
+	}
+	function addApple(){
+		var apple = new appless(Math.random() * width,Math.random() * height);
+		apples.push(apple);
+	}
+
+
+	for(var i = 0; i < 5; i++){
+		addApple();
+	}
+
+	
+	setInterval(eatApple,80);
+
+
+	var snake1 = new snake(0,0,opts.color,1);
+	var snake2 = new snake(-20,0,opts.color,2);
+	var snake3 = new snake(-40,0,opts.color,3);
+	var snake4 = new snake(-40,0,opts.color,3);
+	var snake5 = new snake(-40,0,opts.color,3);
+	var snake6 = new snake(-40,0,opts.color,3);
+	var snake7 = new snake(-40,0,opts.color,3);
+	snakes.push(snake1);
+	snakes.push(snake2);
+	snakes.push(snake3);
+	snakes.push(snake4);
+	snakes.push(snake5);
+	snakes.push(snake6);
+	snakes.push(snake7);
+	
+
+	function eatApple(snake){
+		for(var i = 0; i < apples.length; i++){
+			var distance = Math.sqrt(Math.pow(apples[i].x - snakes[0].x, 2) + Math.pow(apples[i].y - snakes[0].y, 2));
+			if (distance < 25){
+				apples.splice(apples[i],0);
+				var apple = new appless(Math.random() * width,Math.random() * height);
+				apples[i] = apple;
+				
+				  if (direction == 0){
+				 
+				  	snakes.push({
+				  		x : snakes[snakes.length - 1].x,
+						y : snakes[snakes.length - 1].y + 20,
+						color : opts.colorApple,
+						sequencing : 4
+				  	});
+					
+				  }else if (direction == 1){
+
+				  	snakes.push({
+				  		x : snakes[snakes.length - 1].x,
+						y : snakes[snakes.length - 1].y - 20,
+						color : opts.colorApple,
+						sequencing : 4
+				  	});
+
+				  }else if (direction == 2){
+
+				  	snakes.push({
+				  		x : snakes[snakes.length - 1].x + 20,
+						y : snakes[snakes.length - 1].y,
+						color : opts.colorApple,
+						sequencing : 4
+				  	});
+
+				  }else if(direction == 3){
+
+				  	snakes.push({
+				  		x : snakes[snakes.length - 1].x - 20,
+						y : snakes[snakes.length - 1].y,
+						color : opts.colorApple,
+						sequencing : 4
+				  	});
+
+				  }
+				
+			}
+		}
+	}
+
+	function snakeDestroy(){
+		for(var h = 1; h < snakes.length; h++){
+			var distance = Math.sqrt(Math.pow(snakes[h].x - snakes[0].x, 2) + Math.pow(snakes[h].y - snakes[0].y, 2));
+			if (distance <= 1){
+				snakes.splice(3,snakes.length - 4);
+			}
+		}
+	}
+
+	function goSnake(){
+		ctx.clearRect(0,0,width,height);
+
+		window.onkeydown = function(event){
+				console.log(event.keyCode);
+				switch(event.keyCode) {
+					case 87 :
+					if(direction == 1){
+						direction = 1;
+					} else direction = 0;
+						break;
+					case 83:
+						if(direction == 0){
+						direction = 0;
+					} else direction = 1;
+						break;
+					case 65:
+						if(direction == 3){
+						direction = 3;
+					} else direction = 2;
+						break;
+					case 68:
+						if(direction == 2){
+						direction = 2;
+					} else direction = 3;
+						break;
+				}
+			
+			}
+
+		
+			snakes.unshift(snakes.pop(snakes.length-1));
+		
+			switch(direction) {
+				case 0:
+					snakes[0].y = snakes[1].y - opts.size;
+					snakes[0].x = snakes[1].x; 
+					break;
+				case 1:
+					snakes[0].y = snakes[1].y + opts.size;
+					snakes[0].x = snakes[1].x; 
+					break;
+				case 2:
+					snakes[0].x = snakes[1].x - opts.size;
+					snakes[0].y = snakes[1].y;
+					break;
+				case 3:
+					snakes[0].x = snakes[1].x + opts.size;
+					snakes[0].y = snakes[1].y;
+					break;
+			}
+
+			if(snakes[0].x > width){
+			snakes[0].x = 0;
+			} else if(snakes[0].x < 0){
+			snakes[0].x = width;
+			}
+
+			if(snakes[0].y > height){
+			snakes[0].y = 0;
+			} else if(snakes[0].y < 0){
+			snakes[0].y = height;
+			}
+
+			for(var i = 0; i < snakes.length; i++){
+				snake = snakes[i];
+
+				ctx.beginPath();
+				ctx.fillStyle = opts.color;
+				ctx.rect(snake.x,snake.y,opts.size,opts.size);
+				ctx.fill();
+			}
+
+			snakeDestroy();
+			renderApples();
+			setTimeout(goSnake,1000/20);
+
+	}
+	goSnake();
+	
+	
+	function renderApples(){
+		for(var j = 0; j < apples.length; j++){
+			var apple = apples[j];
+			ctx.beginPath();
+			ctx.fillStyle = opts.colorApple;
+			ctx.rect(apple.x, apple.y, opts.size,opts.size);
+			ctx.fill();
+
+		}
+	}
+</script>
